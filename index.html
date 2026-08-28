@@ -1,12 +1,840 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Student Information System</title>
-</head>
+<meta charset="UTF-8">
+<title>Student Information System · DLSU-D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --animo: #006B3C;         /* DLSU-D Lasallian green */
+    --animo-deep: #003D22;    /* Deeper green for shadows */
+    --animo-dark: #001a0f;    /* Near-black green */
+    --gold: #D4A017;          /* Lasallian gold */
+    --gold-soft: #E8C462;
+    --parchment: #F5F1E8;     /* Off-white document */
+    --parchment-2: #EDE6D3;
+    --ink: #1A1A1A;
+    --ink-2: #4A4A4A;
+    --ink-3: #8A8A8A;
+    --rule: rgba(0,107,60,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .serif { font-family: 'Playfair Display', Georgia, serif; }
 
+  /* ========== INSTITUTIONAL BAR ========== */
+  .inst-bar {
+    background: var(--animo-dark);
+    color: var(--parchment);
+    padding: 8px 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--gold);
+  }
+  .inst-bar-left { display: flex; gap: 20px; align-items: center; }
+  .inst-bar-right { display: flex; gap: 20px; align-items: center; }
+  .inst-bar span.sep { opacity: 0.4; }
+
+  /* ========== MASTHEAD (DEEP GREEN HERO) ========== */
+  .masthead {
+    background: var(--animo-deep);
+    color: var(--parchment);
+    padding: 48px 40px 64px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 6px solid var(--gold);
+  }
+  .masthead::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(212,160,23,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(0,107,60,0.4) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .masthead::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.83 0 0 0 0 0.63 0 0 0 0 0.09 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 48px;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .crest {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .crest-svg {
+    width: 68px;
+    height: 78px;
+    flex-shrink: 0;
+  }
+  .crest-text .u {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--gold-soft);
+    margin-bottom: 4px;
+  }
+  .crest-text .n {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--parchment);
+  }
+  .crest-text .m {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--gold-soft);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .masthead-meta-top {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold-soft);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.8;
+  }
+  .masthead-meta-top .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--gold);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.35; transform: scale(0.85); } }
+
+  .title-block {
+    position: relative;
+    z-index: 2;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+  h1.title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(44px, 8vw, 108px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    color: var(--parchment);
+  }
+  h1.title .italic {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold);
+  }
+  .title-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 40px;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .lede {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.55;
+    max-width: 480px;
+    color: rgba(245, 241, 232, 0.85);
+  }
+  .lede em { color: var(--gold-soft); font-style: italic; }
+  .stat {
+    text-align: right;
+    border-left: 1px solid rgba(212, 160, 23, 0.4);
+    padding-left: 32px;
+  }
+  .stat .n {
+    font-family: 'Playfair Display', serif;
+    font-weight: 300;
+    font-size: 84px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--parchment);
+  }
+  .stat .l {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold-soft);
+    margin-top: 10px;
+  }
+
+  /* ========== NAV STRIP (ACADEMIC PROGRAMS) ========== */
+  .nav-strip {
+    background: var(--parchment-2);
+    padding: 14px 40px;
+    display: flex;
+    gap: 32px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--animo-deep);
+  }
+  .nav-strip a {
+    color: inherit;
+    text-decoration: none;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: border 0.2s;
+    white-space: nowrap;
+  }
+  .nav-strip a:hover, .nav-strip a.active {
+    border-bottom-color: var(--gold);
+    color: var(--animo);
+  }
+
+  /* ========== TOOLBAR ========== */
+  .toolbar {
+    background: var(--parchment);
+    padding: 32px 40px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule);
+  }
+  .search {
+    flex: 1;
+    min-width: 260px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1.5px solid var(--animo-deep);
+    padding: 12px 16px;
+    background: white;
+    position: relative;
+  }
+  .search::before {
+    content: "";
+    position: absolute;
+    top: -1.5px; right: -1.5px;
+    width: 12px; height: 12px;
+    background: var(--gold);
+  }
+  .search svg { flex-shrink: 0; color: var(--animo); }
+  .search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--ink);
+  }
+  .search input::placeholder { color: var(--ink-3); font-style: italic; }
+  .toolbar-lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-2);
+  }
+  .pills { display: flex; gap: 0; border: 1.5px solid var(--animo-deep); }
+  .pill {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 16px;
+    background: white;
+    border: none;
+    border-right: 1px solid var(--rule);
+    color: var(--animo-deep);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pill:last-child { border-right: none; }
+  .pill:hover { background: var(--parchment-2); }
+  .pill.active { background: var(--animo); color: var(--parchment); }
+
+  /* ========== SECTION HEADER ========== */
+  .section-hd {
+    padding: 32px 40px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--rule);
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .section-hd h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    color: var(--animo-deep);
+  }
+  .section-hd h2 em { color: var(--gold); font-style: italic; }
+  .section-hd .count-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+  }
+
+  /* ========== ROSTER ========== */
+  .roster {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 0;
+    background: var(--parchment);
+  }
+  .card {
+    padding: 32px 28px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    background: var(--parchment);
+    transition: background 0.25s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+  }
+  .card:hover { background: white; }
+  .card:hover .id-photo { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,61,34,0.15); }
+  .card:hover .id-photo::after { opacity: 1; }
+
+  .card-idx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--animo);
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-idx::before {
+    content: "";
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  /* ID Photo — stylized initial with school seal */
+  .id-photo {
+    width: 88px;
+    height: 108px;
+    position: relative;
+    margin-bottom: 22px;
+    background: var(--animo);
+    color: var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: -0.02em;
+    transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+    border: 2px solid var(--animo-deep);
+  }
+  .id-photo::before {
+    content: "";
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 16px; height: 16px;
+    background: var(--gold);
+  }
+  .id-photo::after {
+    content: "ID";
+    position: absolute;
+    bottom: -2px; left: -2px;
+    background: var(--gold);
+    color: var(--animo-deep);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 2px 6px;
+    opacity: 0.85;
+    transition: opacity 0.3s;
+  }
+  .card:nth-child(4n+2) .id-photo { background: var(--parchment); color: var(--animo-deep); }
+  .card:nth-child(4n+3) .id-photo { background: var(--animo-deep); }
+  .card:nth-child(4n+4) .id-photo { background: var(--gold); color: var(--animo-deep); border-color: var(--gold); }
+  .card:nth-child(4n+4) .id-photo::before { background: var(--animo-deep); }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--animo-deep);
+    margin-bottom: 4px;
+  }
+  .card-name .last { font-style: italic; font-weight: 400; }
+  .card-program {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--animo);
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .card-meta {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+  }
+  .meta-row { display: flex; flex-direction: column; gap: 3px; }
+  .meta-k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+  }
+  .meta-v {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--animo-deep);
+    font-weight: 500;
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--animo);
+  }
+  .status-badge::before {
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--animo);
+    border-radius: 50%;
+  }
+
+  /* ========== MOTTO BAND ========== */
+  .motto {
+    background: var(--animo-deep);
+    color: var(--parchment);
+    padding: 56px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-top: 6px solid var(--gold);
+    border-bottom: 6px solid var(--gold);
+  }
+  .motto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(212,160,23,0.12) 0%, transparent 60%);
+  }
+  .motto .latin {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(28px, 5vw, 56px);
+    letter-spacing: -0.01em;
+    color: var(--parchment);
+    position: relative;
+    z-index: 1;
+  }
+  .motto .latin span { color: var(--gold); font-style: normal; font-weight: 900; }
+  .motto .trans {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--gold-soft);
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ========== FOOTER ========== */
+  footer {
+    padding: 56px 40px 32px;
+    background: var(--parchment);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+  }
+  .foot-mark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--animo-deep);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .foot-mark em { color: var(--gold); font-style: italic; font-weight: 400; }
+  .foot-tag {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-top: 12px;
+    max-width: 380px;
+    line-height: 1.5;
+  }
+  .foot-col h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--animo);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .foot-col p, .foot-col a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+    line-height: 1.9;
+    text-decoration: none;
+    display: block;
+  }
+  .foot-col a:hover { color: var(--animo); }
+  .foot-bottom {
+    grid-column: 1 / -1;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid var(--animo-deep);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .foot-bottom span em { color: var(--animo); font-style: normal; font-weight: 600; }
+
+  .empty {
+    grid-column: 1 / -1;
+    padding: 96px 40px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-3);
+  }
+  .empty::before {
+    content: "—";
+    display: block;
+    color: var(--gold);
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .inst-bar { padding: 8px 20px; font-size: 9px; }
+    .inst-bar-left span:nth-child(3), .inst-bar-right span:nth-child(2) { display: none; }
+    .masthead { padding: 32px 20px 48px; }
+    .nav-strip { padding: 12px 20px; gap: 24px; }
+    .toolbar { padding: 24px 20px 20px; }
+    .section-hd { padding: 24px 20px 16px; }
+    .card { padding: 28px 22px; }
+    .motto { padding: 40px 20px; }
+    footer { padding: 40px 20px 24px; grid-template-columns: 1fr; gap: 32px; }
+    .stat { border-left: none; padding-left: 0; text-align: left; }
+    .stat .n { font-size: 64px; }
+  }
+</style>
+</head>
 <body>
-    <h1>Student Information System</h1>
-    <p>Welcome to our Student Information System Laboratory Project.</p>
+
+<!-- INSTITUTIONAL BAR -->
+<div class="inst-bar">
+  <div class="inst-bar-left">
+    <span>DLSU-D</span>
+    <span class="sep">/</span>
+    <span>Office of the University Registrar</span>
+  </div>
+  <div class="inst-bar-right">
+    <span id="dateStamp">— — —</span>
+    <span class="sep">/</span>
+    <span><span class="live-dot" style="display:inline-block;vertical-align:middle;margin-right:5px;"></span>SYSTEM ONLINE</span>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-top">
+    <div class="crest">
+      <!-- Stylized Lasallian-inspired crest (original, not the actual DLSU-D seal) -->
+      <svg class="crest-svg" viewBox="0 0 68 78" xmlns="http://www.w3.org/2000/svg">
+        <path d="M34 2 L64 12 L64 42 Q64 62 34 76 Q4 62 4 42 L4 12 Z"
+              fill="none" stroke="#D4A017" stroke-width="2"/>
+        <path d="M34 8 L58 16 L58 42 Q58 58 34 70 Q10 58 10 42 L10 16 Z"
+              fill="#D4A017" fill-opacity="0.1" stroke="#D4A017" stroke-width="1"/>
+        <text x="34" y="36" text-anchor="middle" fill="#D4A017"
+              font-family="Playfair Display, serif" font-size="20" font-weight="900" font-style="italic">D</text>
+        <text x="34" y="52" text-anchor="middle" fill="#D4A017"
+              font-family="IBM Plex Mono, monospace" font-size="7" letter-spacing="0.2em">MMXXV</text>
+        <line x1="16" y1="42" x2="24" y2="42" stroke="#D4A017" stroke-width="1"/>
+        <line x1="44" y1="42" x2="52" y2="42" stroke="#D4A017" stroke-width="1"/>
+      </svg>
+      <div class="crest-text">
+        <div class="u">De La Salle University</div>
+        <div class="n">Dasmariñas</div>
+        <div class="m">Animo La Salle · Est. 1977</div>
+      </div>
+    </div>
+    <div class="masthead-meta-top">
+      <div>Academic Year 2025—2026</div>
+      <div>Second Term / Week 08</div>
+      <div id="clockLine">— — : — — MNL</div>
+    </div>
+  </div>
+
+  <div class="title-block">
+    <div class="eyebrow">Student Records · Registry Terminal</div>
+    <h1 class="title">Student<br><span class="italic">Information</span> System.</h1>
+    <div class="title-sub">
+      <p class="lede">
+        The official registry of enrolled Lasallians. Every entry here belongs to
+        someone learning, striving, and <em>animated by faith and zeal for service</em>.
+      </p>
+      <div class="stat">
+        <div class="n" id="countNum">05</div>
+        <div class="l">Enrolled Students</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV STRIP -->
+<nav class="nav-strip">
+  <a href="#" class="active">All Programs</a>
+  <a href="#">BS Information Technology</a>
+  <a href="#">BS Computer Science</a>
+  <a href="#">BS Information Systems</a>
+  <a href="#">BS Computer Engineering</a>
+  <a href="#">BS Multimedia Arts</a>
+</nav>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-4.35-4.35"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Search by name, program, or student number…">
+  </div>
+  <span class="toolbar-lbl">Sort by</span>
+  <div class="pills">
+    <button class="pill active" data-sort="idx">Index</button>
+    <button class="pill" data-sort="name">Surname</button>
+    <button class="pill" data-sort="program">Program</button>
+  </div>
+</div>
+
+<!-- SECTION HEADER -->
+<div class="section-hd">
+  <h2>The <em>Roster</em></h2>
+  <div class="count-note">CICS · College of Information &amp; Computer Studies</div>
+</div>
+
+<!-- ROSTER -->
+<main class="roster" id="roster"></main>
+
+<!-- MOTTO BAND -->
+<section class="motto">
+  <div class="latin"><span>Religio.</span> <span>Mores.</span> <span>Cultura.</span></div>
+  <div class="trans">Faith · Service · Communion in Mission</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="foot-mark">Animo<em>.</em></div>
+    <div class="foot-tag">
+      Student Information System — a Git &amp; GitHub laboratory project
+      by a third-year BS Information Technology student, in the tradition
+      of the Lasallian schools.
+    </div>
+  </div>
+  <div class="foot-col">
+    <h4>Registry</h4>
+    <a href="#">Roster</a>
+    <a href="#">Programs</a>
+    <a href="#">Enrollment</a>
+    <a href="#">Records Request</a>
+  </div>
+  <div class="foot-col">
+    <h4>Campus</h4>
+    <p>Dasmariñas, Cavite</p>
+    <p>Philippines 4114</p>
+    <p>UTC+8 · Asia/Manila</p>
+  </div>
+  <div class="foot-bottom">
+    <span>© MMXXV · Office of the University Registrar</span>
+    <span>Build <em>2025.11 / main</em> · Git &amp; GitHub Laboratory</span>
+  </div>
+</footer>
+
+<script>
+  const STUDENTS = [
+    { idx: 1, first: "Juan",  last: "Dela Cruz", program: "BS Information Technology", prog_short: "BSIT",  year: "3rd Year", sn: "2023-00142", section: "IT-31" },
+    { idx: 2, first: "Maria", last: "Santos",    program: "BS Computer Science",       prog_short: "BSCS",  year: "2nd Year", sn: "2024-00287", section: "CS-21" },
+    { idx: 3, first: "Pedro", last: "Reyes",     program: "BS Information Systems",    prog_short: "BSIS",  year: "3rd Year", sn: "2023-00318", section: "IS-32" },
+    { idx: 4, first: "Ana",   last: "Garcia",    program: "BS Information Technology", prog_short: "BSIT",  year: "1st Year", sn: "2025-00401", section: "IT-11" },
+    { idx: 5, first: "Carlo", last: "Mendoza",   program: "BS Computer Science",       prog_short: "BSCS",  year: "4th Year", sn: "2022-00099", section: "CS-41" },
+  ];
+
+  const roster = document.getElementById('roster');
+  const searchInput = document.getElementById('searchInput');
+  const pills = document.querySelectorAll('.pill');
+  const countNum = document.getElementById('countNum');
+  let currentSort = 'idx';
+
+  function initial(name) { return name[0].toUpperCase(); }
+
+  function render(list) {
+    roster.innerHTML = '';
+    if (list.length === 0) {
+      roster.innerHTML = '<div class="empty">No records found in the registry.</div>';
+      countNum.textContent = '00';
+      return;
+    }
+    countNum.textContent = String(list.length).padStart(2, '0');
+    list.forEach(s => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-idx">№ ${String(s.idx).padStart(4, '0')}</div>
+        <div class="id-photo">${initial(s.first)}</div>
+        <div class="card-name">${s.first} <span class="last">${s.last}</span></div>
+        <div class="card-program">${s.prog_short} · ${s.program}</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <span class="meta-k">Student №</span>
+            <span class="meta-v">${s.sn}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-k">Section</span>
+            <span class="meta-v">${s.section}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-k">Year Level</span>
+            <span class="meta-v">${s.year}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-k">Status</span>
+            <span class="meta-v"><span class="status-badge">Enrolled</span></span>
+          </div>
+        </div>
+      `;
+      roster.appendChild(card);
+    });
+  }
+
+  function apply() {
+    const q = searchInput.value.trim().toLowerCase();
+    let list = STUDENTS.filter(s => {
+      const hay = `${s.first} ${s.last} ${s.program} ${s.prog_short} ${s.sn} ${s.section}`.toLowerCase();
+      return hay.includes(q);
+    });
+    if (currentSort === 'name') list.sort((a, b) => a.last.localeCompare(b.last));
+    else if (currentSort === 'program') list.sort((a, b) => a.program.localeCompare(b.program));
+    else list.sort((a, b) => a.idx - b.idx);
+    render(list);
+  }
+
+  searchInput.addEventListener('input', apply);
+  pills.forEach(p => {
+    p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      currentSort = p.dataset.sort;
+      apply();
+    });
+  });
+
+  // Live Manila clock + date
+  function tick() {
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-GB', {
+      timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    const d = now.toLocaleDateString('en-GB', {
+      timeZone: 'Asia/Manila', weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
+    });
+    document.getElementById('clockLine').textContent = `${t} MNL / UTC+8`;
+    document.getElementById('dateStamp').textContent = d.toUpperCase();
+  }
+  tick(); setInterval(tick, 30000);
+
+  apply();
+</script>
 
 </body>
 </html>
